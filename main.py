@@ -1,4 +1,5 @@
 import threading
+import time
 
 class Product:
     def __init__(self,name:str,price:float,count:int):
@@ -82,6 +83,7 @@ class Saler:
         self.__name = name
         self.__money = money
         self.__products = {product.name:product for product in products}
+        self.lock = threading.Lock()
     
     @property
     def products(self):
@@ -109,11 +111,12 @@ class Saler:
     
     @money.setter
     def money(self,money):
-        if not isinstance(money,(int,float)):
-            raise TypeError("money should be type:int or float")
-        elif money < 0:
-            raise ValueError("money should be bigest or equal of zero")
-        self.__money = money
+        with self.lock:
+            if not isinstance(money,(int,float)):
+                raise TypeError("money should be type:int or float")
+            elif money < 0:
+                raise ValueError("money should be bigest or equal of zero")
+            self.__money = money
     
     @property 
     def name(self):
@@ -237,6 +240,7 @@ class Magazin:
         self.__buyers = {buyer.name:buyer for buyer in buyers}
         self.__salers = {saler.name:saler for saler in salers}
         self.__orders = []
+        self.lock = threading.Lock()
     
     def __new__(cls,*args,**kwargs):
         if Magazin.instance is None:
@@ -262,32 +266,32 @@ class Magazin:
     def orders(self):
         return self.__orders
     
-    def transaction(self,saler,product,buyer,count_product):
-        if saler not in self.__salers:
-            raise ValueError("saler should be in salers")
-        elif product not in self.salers[saler].products:
-            raise ValueError("product should be in saler products")
-        elif buyer not in self.buyers:
-            raise ValueError("buyer should be in buyers")
-        elif not isinstance(count_product,int):
-            raise TypeError("count should be type:int")
-        elif self.salers[saler].products[product].count < count_product:
-            raise ValueError("count of product in saler should be bigest or equal of input count of product")
-        elif self.buyers[buyer].money < count_product*self.salers[saler].products[product].price:
-            raise ValueError("money of buyer should many or equal of price_product*count_product")
-        
-        with threading.Lock():
-            SALER = self.salers[saler]
-            BUYER = self.buyers[buyer]
-            PRODUCT = SALER.products[product]
-            COUNT = count_product
-            PRICE = PRODUCT.price*COUNT
+    def transaction(self,saler_name,product_name,buyer_name,count_product):
+        with self.lock:
+            if saler_name not in self.__salers:
+                raise ValueError("saler should be in salers")
+            elif product_name not in self.salers[saler_name].products:
+                raise ValueError("product should be in saler products")
+            elif buyer_name not in self.buyers:
+                raise ValueError("buyer should be in buyers")
+            elif not isinstance(count_product,int):
+                raise TypeError("count should be type:int")
+            elif self.salers[saler_name].products[product_name].count < count_product:
+                raise ValueError("count of product in saler should be bigest or equal of input count of product")
+            elif self.buyers[buyer_name].money < count_product*self.salers[saler_name].products[product_name].price:
+                raise ValueError("money of buyer should many or equal of price_product*count_product")
             
-            SALER.money += PRICE 
-            BUYER.money -= PRICE
-            PRODUCT.count -= COUNT
+            
+            saler = self.salers[saler_name]
+            buyer = self.buyers[buyer_name]
+            product = saler.products[product_name]
+            price = product.price*count_product
+                
+            saler.money += price 
+            buyer.money -= price
+            product.count -= count_product
 
-            self.__orders.append(Order(SALER,PRODUCT,COUNT,BUYER))
+            self.__orders.append(Order(saler,product,count_product,buyer))
 
     def __repr__(self):
         return f"{self.__name}/{self.__buyers}/{self.__salers}"  
@@ -318,12 +322,12 @@ def change_buyers(magazin):
 def main():
     
 
-    saler1 = Saler("sal1",10,Product("c++",200,10),Product("comp",1800,10))
-    saler2 = Saler("sal2",0,Product("comp",1100,20),Product("cpp",160,100))
-    buyer1 = Buyer("buy1","Пушкина21Б",1000)
-    buyer2 = Buyer("buy2","Шевченко30",3000)
-    buyer3 = Buyer("buy3","Картафана40",100)
-    MAGAZIN = Magazin("Rozetka",[buyer1,buyer2,buyer3],[saler1,saler2])
+    saler1 = Saler("sal1",10,Product("c++",200,1000),Product("comp",1800,1000))
+    saler2 = Saler("sal2",0,Product("comp",1100,2000),Product("cpp",160,1000))
+    buyer1 = Buyer("buy1","Пушкина21Б",10000)
+    buyer2 = Buyer("buy2","Шевченко30",10000)
+    buyer3 = Buyer("buy3","Картафана40",10000)
+    magaz = Magazin("Rozetka",[buyer1,buyer2,buyer3],[saler1,saler2])
     
     
     print("exit - завершает работу, выводя список заказов")
@@ -342,33 +346,34 @@ def main():
         comand = input("> ")
         if comand == "salers":
             print("_ "*60)
-            for saler in MAGAZIN.salers:
-                print(MAGAZIN.salers[saler])
+            for saler in magaz.salers:
+                print(magaz.salers[saler])
             print("_ "*60)
         elif comand == "buyers":
             print("_ "*60)
-            for buyer in MAGAZIN.buyers:
-                print(MAGAZIN.buyers[buyer])
+            for buyer in magaz.buyers:
+                print(magaz.buyers[buyer])
             print("_ "*60)
 
         elif comand == "search salers":
             product_name = input("product> ")
             print("_ "*60)
-            for saler in MAGAZIN.search_salers(product_name):
+            for saler in magaz.search_salers(product_name):
                 print(saler)
             print("_ "*60)
 
         elif comand == "buy product":
             print("_ "*60)
             try:
-                product = input("product> ")
-                saler = input("saler name> ")
-                buyer = input("buyer name> ")
+                product_name = input("product> ")
+                saler_name = input("saler name> ")
+                buyer_name = input("buyer name> ")
                 count_product = int(input("count of product> "))
                 #MAGAZIN.transaction(saler,product,buyer,count_product)
-                thread = threading.Thread(target=MAGAZIN.transaction,args=(saler,product,buyer,count_product))
+                thread = threading.Thread(target=magaz.transaction,args=(saler_name,product_name,buyer_name,count_product))
                 threads.append(thread)
                 thread.start()
+
             except Exception as error:
                 print(f"ERROR:{error}\nTry again please\n")
             else:
@@ -378,58 +383,33 @@ def main():
         elif comand == "change buyer":
             print("_ "*60)
             try:
-                print(change_buyers(MAGAZIN))
+                print(change_buyers(magaz))
             except Exception as error:
                 print(f"ERROR:{error}\nTry again please\n")
             print("_ "*60)
             
         elif comand == "orders":
             print("_ "*60)
-            for order in MAGAZIN.orders:
+            for order in magaz.orders:
                 print(order)
             print("_ "*60)
 
         elif comand == "exit":
             print("_ "*60)
-            for order in MAGAZIN.orders:
+            for order in magaz.orders:
                 print(order)
             print("salers balances:")
-            for saler in MAGAZIN.salers:
-                print(MAGAZIN.salers[saler].name,"-",MAGAZIN.salers[saler].money)
+            for saler in magaz.salers:
+                print(magaz.salers[saler].name,"-",magaz.salers[saler].money)
 
             print("_ "*60)
             break
 
-        else: 
-            for thread in threads:
-                thread.join()
-            continue
-   
-def test():
-        
+    for thread in threads:
+        thread.join()
 
-    saler1 = Saler("sal1",10,Product("c++",200,100_000),Product("comp",1800,10_000))
-    saler2 = Saler("sal2",0,Product("comp",1100,20000),Product("cpp",160,10000))
-    buyer1 = Buyer("buy1","Пушкина21Б",10000000000)
-    buyer2 = Buyer("buy2","Шевченко30",300000000000)
-    buyer3 = Buyer("buy3","Картафана40",10000000000)
-    MAGAZIN = Magazin("Rozetka",[buyer1,buyer2,buyer3],[saler1,saler2])
-    threads = []
-    for i in range(43):
-        thread1 = threading.Thread(target=MAGAZIN.transaction,args=("sal1","c++","buy1",1))
-        thread2 = threading.Thread(target=MAGAZIN.transaction,args=("sal1","comp","buy2",1))
 
-        threads.append(thread1)
-        threads.append(thread2)
-        thread1.start()
-        thread2.start()
-        thread1.join()
-        thread2.join()
-
-    print(MAGAZIN.salers)
-    print(MAGAZIN.buyers)
-    
 if __name__ == "__main__":
-    test()
+    main()
     
     
