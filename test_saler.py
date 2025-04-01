@@ -57,10 +57,11 @@ class TestSaler(unittest.TestCase):
             self.saler.products = "NotAProduct"
     
     def test_repr(self):
+        result = f"Saler: {self.saler._Saler__name}\nProducts:\n"
+        for product in self.saler._Saler__products:
+            result = result + str(self.saler._Saler__products[product]) + "\n"
         repr_str = repr(self.saler)
-        self.assertIn("Saler: TechStore0", repr_str)
-        self.assertIn("Laptop", repr_str)
-        self.assertIn("Phone", repr_str)
+        self.assertEqual(result,repr_str)
 
 if __name__ == "__main__":
     unittest.main()

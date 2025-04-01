@@ -4,7 +4,7 @@ from product import Product
 
 class Order:
     number = 0
-    def __init__(self,saler,product,product_count,buyer):
+    def __init__(self,saler:Saler,product:Product,product_count:int,buyer:Buyer):
         if not isinstance(saler,Saler):
             raise TypeError("saler should be type:Saler")
         elif not isinstance(product,Product):
@@ -28,6 +28,14 @@ class Order:
         result += f"Buyer:{self.__buyer.name}\n"
         result += f"Buyer adress:{self.__buyer.adress}\n"
         return result
+    
+    @property
+    def saler(self):
+        return self.__saler
+    
+    @property
+    def buyer(self):
+        return self.__buyer
     
     def __hash__(self):
         return str(self).__hash__()

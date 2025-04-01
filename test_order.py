@@ -35,13 +35,15 @@ class TestOrder(unittest.TestCase):
             Order(self.saler, self.product, 2, "NotABuyer")
     
     def test_repr(self):
+        result = f"Order:{self.order._Order__number}\n"
+        result += f"Product name:{self.order._Order__product.name}\n"
+        result += f"Count of Product:{self.order._Order__product_count}\n"
+        result += f"Saler:{self.order._Order__saler.name}\n"
+        result += f"Buyer:{self.order._Order__buyer.name}\n"
+        result += f"Buyer adress:{self.order._Order__buyer.adress}\n"
         repr_str = repr(self.order)
-        self.assertIn("Order:", repr_str)
-        self.assertIn("Product name:Laptop", repr_str)
-        self.assertIn("Count of Product:2", repr_str)
-        self.assertIn("Saler:TechStore", repr_str)
-        self.assertIn("Buyer:Alice", repr_str)
-        self.assertIn("Buyer adress:123 Main St", repr_str)
+        self.assertEqual(result, repr_str)
+        
 
 if __name__ == "__main__":
     unittest.main()

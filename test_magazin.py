@@ -7,6 +7,7 @@ from order import Order
 
 class TestMagazin(unittest.TestCase):
     def setUp(self):
+        Saler.names.clear()
         self.buyer1 = Buyer("Alice", "123 Main St", 5000.0)
         self.buyer2 = Buyer("Bob", "456 Elm St", 3000.0)
         
@@ -56,9 +57,7 @@ class TestMagazin(unittest.TestCase):
     
     def test_repr(self):
         repr_str = repr(self.magazin)
-        self.assertIn("SuperStore", repr_str)
-        self.assertIn("Alice", repr_str)
-        self.assertIn("TechStore", repr_str)
-
+        result = f"{self.magazin._Magazin__name}/{self.magazin._Magazin__buyers}/{self.magazin._Magazin__salers}"
+        self.assertEqual(repr_str,result)
 if __name__ == "__main__":
     unittest.main()

@@ -3,7 +3,7 @@ import threading
 
 class Saler:
     names = set()
-    def __init__(self,name,money,*products):
+    def __init__(self,name:str,money:(int|float)=0,*products):
         if not isinstance(name,str):
             raise TypeError("name should be type:str")
         elif not all(isinstance(obj,Product) for obj in products):
@@ -45,9 +45,14 @@ class Saler:
         self.__products = {product.name:product for product in products}
     
     def update_products(self):
-        for key in self.__products:
-            self.__products[self.__products[key].name] = self.__products[key]
-            del self.__products[key] 
+        oldkeylist = []
+        for key in self.__products.keys():
+            new_key =self.__products[key].name
+            self.__products[new_key] = self.__products[key]
+            if new_key != key:
+                oldkeylist.append(key)
+        for key in oldkeylist:
+            del self.__products[key]
 
     @property
     def money(self):

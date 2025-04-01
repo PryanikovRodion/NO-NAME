@@ -37,7 +37,21 @@ class Magazin:
         for saler in self.__salers:
             if name in self.__salers[saler].products:
                 yield self.__salers[saler]
-        
+
+    def add_user(self,user):
+        if type(user) == Saler:
+            if user.name not in self.__salers:
+                self.__salers[user.name] = user
+            else:
+                raise ValueError("User name in store(magazin) should be unique")
+        elif type(user) == Buyer:
+            if user.name not in self.__buyers:
+                self.__buyers[user.name] = user
+            else:
+                raise ValueError("User name in store(magazin) should be unique")
+        else:
+            raise TypeError("User in store(magazin) should be: Saler or Buyer")
+
     
     @property
     def salers(self):
@@ -51,7 +65,20 @@ class Magazin:
     def orders(self):
         return self.__orders
     
-    def transaction(self,saler_name,product_name,buyer_name,count_product):
+    def user_orders(self,key:str,user_name):
+        if key.lower() == "s":
+            result = []
+            for order in self.orders:
+                if order.saler.name == user_name:
+                    result.append(order)
+        elif key.lower() == "b":
+            result = []
+            for order in self.orders:
+                if order.buyer.name == user_name:
+                    result.append(order)
+        return result
+    
+    def transaction(self,saler_name:str,product_name:str,buyer_name:str,count_product:int):
         with self.lock:
             if saler_name not in self.__salers:
                 raise ValueError("saler should be in salers")
@@ -61,6 +88,8 @@ class Magazin:
                 raise ValueError("buyer should be in buyers")
             elif not isinstance(count_product,int):
                 raise TypeError("count should be type:int")
+            elif count_product <= 0:
+                raise ValueError("input count of product should be bigest of zero")
             elif self.salers[saler_name].products[product_name].count < count_product:
                 raise ValueError("count of product in saler should be bigest or equal of input count of product")
             elif self.buyers[buyer_name].money < count_product*self.salers[saler_name].products[product_name].price:
@@ -79,7 +108,7 @@ class Magazin:
             self.__orders.append(Order(saler,product,count_product,buyer))
 
     def __repr__(self):
-        return f"{self.__name}/{self.__buyers}/{self.__salers}"  
+        return f"{self.__name}/{self.__buyers}/{self.__salers}"
     
 
 def change_buyers(magazin):

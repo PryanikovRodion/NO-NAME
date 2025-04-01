@@ -9,7 +9,7 @@ class Product:
         elif price <= 0:
             raise ValueError("price should be bigest of zero")
         elif count < 0:
-            raise ValueError("count should be bigest or equal of zero")
+            raise ValueError("count should be bigest of zero")
         self.__name = name
         self.__price = price
         self.__count = count
