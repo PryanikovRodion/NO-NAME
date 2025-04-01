@@ -144,6 +144,7 @@ def createClientSaler(saler_name=None):
     menu.add_command(label="INFO",command=lambda:createInfoSaler())
     menu.add_command(label="PRODUCTS",command=lambda:createProductsSaler())
     menu.add_command(label="ADD PRODUCT",command=lambda:createAddProductSaler())
+    menu.add_command(label="ORDERS",command= lambda:createOrders("s"))
     menu.add_command(label="exit",command=lambda:createLoginLogout())
     root.config(menu=menu)
     createInfoSaler()
@@ -341,7 +342,7 @@ def createLogout():
     radioSaler.pack(expand=True,fill="both",anchor="center", padx=PADX, pady=PADY)
     btnBack.pack(expand=True, fill="both", padx=PADX, pady=PADY)
 
-def createLoginBuyer():
+def createLoginBuyer1():
     clearWindow()
     def selection(event):
         selected_indices = listbox.curselection()  
@@ -358,7 +359,30 @@ def createLoginBuyer():
     btnBack = tk.Button(root,text="Go Back",font=FONT_3,command=lambda:createLogin())
     btnBack.pack(expand=True, fill="both", padx=PADX, pady=PADY)
 
-def createLoginSaler():
+def createLoginBuyer():
+    clearWindow()
+
+    def selection(event):
+        selected_indices = listbox.curselection()
+        if selected_indices:
+            selected_text = listbox.get(selected_indices[0])
+            createClientBuyer(selected_text)
+
+    btnBack = tk.Button(root, text="Go Back", font=FONT_3, command=lambda: createLogin())
+    btnBack.pack(padx=PADX, pady=PADY)
+    frame = tk.Frame(root)
+    frame.pack(expand=True, fill="both", padx=PADX, pady=PADY)
+    listbox = tk.Listbox(frame, height=10, font=FONT_2)
+    listbox.pack(side=tk.LEFT, expand=True, fill="both")
+    scrollbar = tk.Scrollbar(frame, orient=tk.VERTICAL, command=listbox.yview)
+    scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+    listbox.config(yscrollcommand=scrollbar.set)
+    for buyer in magaz.buyers:
+        listbox.insert(tk.END, buyer)
+    listbox.bind("<<ListboxSelect>>", selection)
+    
+
+def createLoginSaler1():
     clearWindow()
     def show_selection(event):
         selected_indices = listbox.curselection()  
@@ -367,15 +391,37 @@ def createLoginSaler():
             createClientSaler(selected_text)
 
     listbox = tk.Listbox(root, height=len(magaz.salers),font=FONT_2)
-    listbox.pack(padx=PADX, pady=PADY, fill="both",anchor="center")
+    listbox.pack(expand=True,padx=PADX, pady=PADY, fill="both",anchor="center")
     for saler in magaz.salers:
         listbox.insert(tk.END, saler)  
     label = tk.Label(root, text="Выберите элемент",font=FONT_2)
-    label.pack(expand=True,pady=5)
+    label.pack(expand=True,pady=PADY)
     listbox.bind("<<ListboxSelect>>", show_selection)
     btnBack = tk.Button(root,text="Go Back",font=FONT_3,command=lambda:createLogin())
     btnBack.pack(expand=True, fill="both", padx=PADX, pady=PADY)
 
+def createLoginSaler():
+    clearWindow()
+
+    def show_selection(event):
+        selected_indices = listbox.curselection()
+        if selected_indices:
+            selected_text = listbox.get(selected_indices[0])
+            createClientSaler(selected_text)
+    
+    btnBack = tk.Button(root, text="Go Back", font=FONT_3, command=lambda: createLogin())
+    btnBack.pack(padx=PADX, pady=PADY)
+    frame = tk.Frame(root)
+    frame.pack(expand=True, fill="both", padx=PADX, pady=PADY)
+    listbox = tk.Listbox(frame, height=len(magaz.salers), font=FONT_2)
+    listbox.pack(side=tk.LEFT, expand=True, fill="both")
+    scrollbar = tk.Scrollbar(frame, orient=tk.VERTICAL, command=listbox.yview)
+    scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+    listbox.config(yscrollcommand=scrollbar.set)
+    for saler in magaz.salers:
+        listbox.insert(tk.END, saler)
+    listbox.bind("<<ListboxSelect>>", show_selection)
+    
 def createLoginLogout():
     clearWindow()
     root.title("Login / Logout")
