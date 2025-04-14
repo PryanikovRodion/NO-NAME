@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Hi, {{ current_user.username }}!</h1>
+{% if title %}
+<h2>welcom to {{title}}</h2>
+{% else %}
+<h2>welcom to store</h2>
+{% endif %}
+{% endblock %}
+</html>

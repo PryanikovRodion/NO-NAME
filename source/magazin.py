@@ -2,7 +2,7 @@ from source.saler import Saler
 from source.buyer import Buyer
 from source.product import Product
 from source.order import Order
-import threading
+#import threading
 
 class Magazin:
     instance = None
@@ -25,7 +25,7 @@ class Magazin:
         self.__buyers = {buyer.name:buyer for buyer in buyers}
         self.__salers = {saler.name:saler for saler in salers}
         self.__orders = []
-        self.lock = threading.Lock()
+        #self.lock = threading.Lock()
     
     def __new__(cls,*args,**kwargs):
         if Magazin.instance is None:

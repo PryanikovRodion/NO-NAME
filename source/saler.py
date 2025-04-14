@@ -27,7 +27,8 @@ class Saler:
         self.__name = name
         self.__money = money
         self.__products = {product.name:product for product in products}
-        self.lock = threading.Lock()
+        #self.lock = threading.Lock()
+
     
     @property
     def products(self):
@@ -60,12 +61,12 @@ class Saler:
     
     @money.setter
     def money(self,money):
-        with self.lock:
-            if not isinstance(money,(int,float)):
-                raise TypeError("money should be type:int or float")
-            elif money < 0:
-                raise ValueError("money should be bigest or equal of zero")
-            self.__money = money
+        #with self.lock:
+        if not isinstance(money,(int,float)):
+            raise TypeError("money should be type:int or float")
+        elif money < 0:
+            raise ValueError("money should be bigest or equal of zero")
+        self.__money = money
     
     @property 
     def name(self):
@@ -88,3 +89,5 @@ class Saler:
     
     def __hash__(self):
         return str(self).__hash__()
+    
+    

@@ -1,11 +1,13 @@
 import sys
 import os
+import json
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from source.saler import Saler
 from source.buyer import Buyer
 from source.product import Product
 from source.magazin import Magazin
 import threading
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'console')))
 
 def change_buyers(magazin):
     buyer_name = input("name of buyer> ")
@@ -30,6 +32,7 @@ def change_buyers(magazin):
     return "change buyer complete"
 
 def main():
+    
     saler1 = Saler("sal1",10,Product("c++",200,1000),Product("comp",1800,1000))
     saler2 = Saler("sal2",0,Product("comp",1100,2000),Product("cpp",160,1000))
     buyer1 = Buyer("buy1","Пушкина21Б",10000)
@@ -49,7 +52,7 @@ def main():
     #print("add buyer - добавляет покупателя")
     #print("add saler - добавляет продавца")
 
-    threads = []
+    #threads = []
     while True:
         comand = input("> ")
         if comand == "salers":
@@ -77,10 +80,11 @@ def main():
                 saler_name = input("saler name> ")
                 buyer_name = input("buyer name> ")
                 count_product = int(input("count of product> "))
-                #MAGAZIN.transaction(saler,product,buyer,count_product)
-                thread = threading.Thread(target=magaz.transaction,args=(saler_name,product_name,buyer_name,count_product))
-                threads.append(thread)
-                thread.start()
+                magaz.transaction(saler_name,product_name,buyer_name,count_product)
+                # при возникновении ошибок внутри потока программа падает
+                #thread = threading.Thread(target=magaz.transaction,args=(saler_name,product_name,buyer_name,count_product))
+                #threads.append(thread)
+                #thread.start()
 
             except Exception as error:
                 print(f"ERROR:{error}\nTry again please\n")
@@ -111,10 +115,13 @@ def main():
                 print(magaz.salers[saler].name,"-",magaz.salers[saler].money)
 
             print("_ "*60)
+            # json не поддерживает сериализацию екземпляров самописных классов 
+            #with open('data.json', 'w', encoding='utf-8') as f:
+            #    json.dump(magaz, f, ensure_ascii=False, indent=2)
             break
-
-    for thread in threads:
-        thread.join()
+    # ненавижу многопоточность
+    #for thread in threads:
+    #    thread.join()
 
 
 if __name__ == "__main__":

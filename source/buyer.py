@@ -8,7 +8,7 @@ class Buyer:
             raise TypeError("money should be type:int or float")
         self.__name = name
         self.__adress = adress
-        self.__money = money  
+        self.__money = money
     
     @property
     def name(self):
