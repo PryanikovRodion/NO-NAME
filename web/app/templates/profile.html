@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+{% extends "index.html" %}
+
+{% block content %}
+<h1>Profile</h1>
+<h2>Name: {{current_user.username}}</h2>
+<h2>Email: {{current_user.email}}</h2>
+<h2>Role: {{current_user.role}}</h2>
+{% if current_user.role == "buyer" %}
+<h2>Balance: {{store.buyers[current_user.username].money}}$</h2>
+{% endif %}
+{% if current_user.role == "saler" %}
+<h2>Balance: {{store.salers[current_user.username].money}}$</h2>
+{% endif %}
+{% endblock %}
+</html>

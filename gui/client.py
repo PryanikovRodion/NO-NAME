@@ -6,6 +6,7 @@ from source.saler import Saler
 from source.buyer import Buyer
 from source.product import Product
 from source.magazin import Magazin
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '/gui')))
 from tkinter import messagebox as ms
 
 

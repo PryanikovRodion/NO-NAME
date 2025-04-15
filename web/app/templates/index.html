@@ -9,4 +9,14 @@
 <h2>welcom to store</h2>
 {% endif %}
 {% endblock %}
+
+{% block user_menu %}
+<a href="{{ url_for('profile') }}">Profile</a>
+{% if current_user.role == "buyer" %}
+<a href="{{ url_for('profile') }}">Catalog</a>
+{% endif %}
+{% if current_user.role == "saler" %}
+<a href="{{ url_for('profile') }}">My products</a>
+{% endif %}
+{% endblock %}
 </html>

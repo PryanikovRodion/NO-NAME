@@ -5,7 +5,7 @@
     {% if title %}
     <title>{{ title }}</title>
     {% else %}
-    <title>title</title>
+    <title>Store</title>
     {% endif %}
 </head>
 
@@ -20,11 +20,13 @@
     <div>
         Store:
         <a href="{{ url_for('index') }}">Home</a>
+        {% block user_menu %}{% endblock %}
         {% if current_user.is_anonymous %}
         <a href="{{ url_for('login') }}">Login</a>
         {% else %}
         <a href="{{ url_for('logout') }}">Logout</a>
         {% endif %}
+        <a href="{{ url_for('register') }}">Registration</a>
     </div>
     <hr>
     {% with messages = get_flashed_messages() %}

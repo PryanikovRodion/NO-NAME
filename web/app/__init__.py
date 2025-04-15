@@ -19,10 +19,10 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 login = LoginManager(app)
 login.login_view = 'login'
-filename = '../store'
+filename = 'web/store'
 
 # Создаем папку, если её нет
-os.makedirs(os.path.dirname(filename), exist_ok=True)
+#os.makedirs(os.path.dirname(filename), exist_ok=True)
 
 # Открываем shelve-файл
 with shelve.open(filename) as dbs:
