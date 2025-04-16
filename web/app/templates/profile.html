@@ -1,16 +1,45 @@
 <!DOCTYPE html>
+
 {% extends "index.html" %}
 
 {% block content %}
+
 <h1>Profile</h1>
 <h2>Name: {{current_user.username}}</h2>
 <h2>Email: {{current_user.email}}</h2>
 <h2>Role: {{current_user.role}}</h2>
+
 {% if current_user.role == "buyer" %}
 <h2>Balance: {{store.buyers[current_user.username].money}}$</h2>
+<h2>Add Money</h1>
+    <form action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.money.label }}<br>
+            {{ form.money(size=32) }}<br>
+            {% for error in form.money.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
 {% endif %}
+
+
 {% if current_user.role == "saler" %}
 <h2>Balance: {{store.salers[current_user.username].money}}$</h2>
+<h2>Products:</h2>
+<hr>
+{% for product in store.salers[current_user.username].products %}
+<div>
+    <p>Name:{{store.salers[current_user.username].products[product].name}}</p>  
+    <p>Price:{{store.salers[current_user.username].products[product].price}}</p>  
+    <p>Count:{{store.salers[current_user.username].products[product].count}}</p>     
+</div>
+<hr>
+{% endfor %}
+
 {% endif %}
 {% endblock %}
+
 </html>

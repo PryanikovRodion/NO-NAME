@@ -2,7 +2,7 @@ from source.saler import Saler
 from source.buyer import Buyer
 from source.product import Product
 from source.order import Order
-#import threading
+
 
 class Magazin:
     instance = None
@@ -25,7 +25,7 @@ class Magazin:
         self.__buyers = {buyer.name:buyer for buyer in buyers}
         self.__salers = {saler.name:saler for saler in salers}
         self.__orders = []
-        #self.lock = threading.Lock()
+       
     
     def __new__(cls,*args,**kwargs):
         if Magazin.instance is None:
@@ -79,33 +79,33 @@ class Magazin:
         return result
     
     def transaction(self,saler_name:str,product_name:str,buyer_name:str,count_product:int):
-        with self.lock:
-            if saler_name not in self.__salers:
-                raise ValueError("saler should be in salers")
-            elif product_name not in self.salers[saler_name].products:
-                raise ValueError("product should be in saler products")
-            elif buyer_name not in self.buyers:
-                raise ValueError("buyer should be in buyers")
-            elif not isinstance(count_product,int):
-                raise TypeError("count should be type:int")
-            elif count_product <= 0:
-                raise ValueError("input count of product should be bigest of zero")
-            elif self.salers[saler_name].products[product_name].count < count_product:
-                raise ValueError("count of product in saler should be bigest or equal of input count of product")
-            elif self.buyers[buyer_name].money < count_product*self.salers[saler_name].products[product_name].price:
-                raise ValueError("money of buyer should many or equal of price_product*count_product")
+       
+        if saler_name not in self.__salers:
+            raise ValueError("saler should be in salers")
+        elif product_name not in self.salers[saler_name].products:
+            raise ValueError("product should be in saler products")
+        elif buyer_name not in self.buyers:
+            raise ValueError("buyer should be in buyers")
+        elif not isinstance(count_product,int):
+            raise TypeError("count should be type:int")
+        elif count_product <= 0:
+            raise ValueError("input count of product should be bigest of zero")
+        elif self.salers[saler_name].products[product_name].count < count_product:
+            raise ValueError("count of product in saler should be bigest or equal of input count of product")
+        elif self.buyers[buyer_name].money < count_product*self.salers[saler_name].products[product_name].price:
+            raise ValueError("money of buyer should many or equal of price_product*count_product")
             
             
-            saler = self.salers[saler_name]
-            buyer = self.buyers[buyer_name]
-            product = saler.products[product_name]
-            price = product.price*count_product
+        saler = self.salers[saler_name]
+        buyer = self.buyers[buyer_name]
+        product = saler.products[product_name]
+        price = product.price*count_product
                 
-            saler.money += price 
-            buyer.money -= price
-            product.count -= count_product
+        saler.money += price 
+        buyer.money -= price
+        product.count -= count_product
 
-            self.__orders.append(Order(saler,product,count_product,buyer))
+        self.__orders.append(Order(saler,product,count_product,buyer))
 
     def __repr__(self):
         return f"{self.__name}/{self.__buyers}/{self.__salers}"

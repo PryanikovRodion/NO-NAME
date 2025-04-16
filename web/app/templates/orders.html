@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+{% extends "index.html" %}
+
+{% block content%}
+{% for order in store.orders%}
+<p>{{order}}</p>
+{% endfor %}
+{% endblock %}
+</html>

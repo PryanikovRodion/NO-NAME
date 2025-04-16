@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+{% extends "index.html" %}
+
+{% block content %}
+{% if current_user.role == "buyer"%}
+<h1>Sign In</h1>
+    <form action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.salername.label }}<br>
+            {{ form.salername(size=32) }}<br>
+            {% for error in form.salername.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.productname.label }}<br>
+            {{ form.productname(size=32) }}<br>
+            {% for error in form.productname.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.count.label }}<br>
+            {{ form.count(size=32) }}<br>
+            {% for error in form.count.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+{% endif %}
+{% for saler in store.salers%}
+<h2>Saler Name:{{store.salers[saler].name}}</h2>
+<div>
+{% for product in store.salers[saler].products%}
+<div></div>
+<h3>Produc</h3> 
+<p>Name:{{store.salers[saler].products[product].name}}</p>
+<p>Price:{{store.salers[saler].products[product].price}}</p>
+<p>Count{{store.salers[saler].products[product].count}}</p>
+</div>
+{% endfor %}
+</div>
+{% endfor %}
+{% endblock %}
+</html>

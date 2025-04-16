@@ -1,7 +1,7 @@
 
 from flask import render_template, flash, redirect, url_for, request
-from app import app,db, Buyer, Saler, store
-from app.forms import LoginForm, RegistrationForm
+from app import app,db, store, Buyer, Saler, Product
+from app.forms import LoginForm, RegistrationForm, SalerAddProductForm, BuyerAddMoneyForm, BuyProductForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User
 from urllib.parse import urlparse
@@ -42,7 +42,7 @@ def register():
         return redirect(url_for('index'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data, role=form.role.data )
+        user = User(username=form.username.data, email=form.email.data, role=form.role.data)
         user.set_password(form.password.data)
         db.session.add(user)
         if user.role == "buyer":
@@ -56,6 +56,44 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
-@app.route('/profile')
+@app.route('/profile', methods=['GET', 'POST'])
+@login_required
 def profile():
-    return render_template("profile.html",store=store)
+    form = BuyerAddMoneyForm()
+    if form.validate_on_submit():
+        store.buyers[current_user.username].money += form.money.data
+        next_page = request.args.get('next')
+        if not next_page or urlparse(next_page).netloc != '':
+            next_page = url_for('profile')
+        return redirect(next_page)
+    return render_template("profile.html",title="Profile", store=store, form=form)
+
+@app.route('/saler_add_product',methods=['GET', 'POST'])
+@login_required
+def saler_add_product():
+    if current_user.role != "saler":
+        return redirect(url_for('profile'))
+    form = SalerAddProductForm()
+    if form.validate_on_submit():
+        store.salers[current_user.username].products[form.name.data] = Product(form.name.data,form.price.data,form.count.data)
+        store.salers[current_user.username].update_products()
+        next_page = request.args.get('next')
+        if not next_page or urlparse(next_page).netloc != '':
+            next_page = url_for('profile')
+        return redirect(next_page)
+    return render_template('addproduct.html', title='Add product', form=form)
+
+@app.route('/catalog',methods=['GET', 'POST'])
+def catalog():
+    form=BuyProductForm()
+    if form.validate_on_submit():
+        try:
+            store.transaction(form.salername.data,form.productname.data,current_user.username,form.count.data)
+        except Exception as er:
+            flash(er)
+    return render_template('catalog.html', title='Catalog',store=store, form=form)
+    
+@app.route('/orders')
+@login_required
+def orders():
+    return render_template("orders.html", title='Orders', store=store)

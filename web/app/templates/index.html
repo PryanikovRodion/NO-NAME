@@ -11,12 +11,11 @@
 {% endblock %}
 
 {% block user_menu %}
+{% if current_user.is_authenticated%}
 <a href="{{ url_for('profile') }}">Profile</a>
-{% if current_user.role == "buyer" %}
-<a href="{{ url_for('profile') }}">Catalog</a>
-{% endif %}
 {% if current_user.role == "saler" %}
-<a href="{{ url_for('profile') }}">My products</a>
+<a href="{{ url_for('saler_add_product') }}">Add product</a>
+{% endif %}
 {% endif %}
 {% endblock %}
 </html>
